@@ -1,5 +1,8 @@
 #Ignore personal files
 secret.txt
+known_devices.yaml
+code
+vscode_cli.tar.gz
 # Generic ignores
 *.log
 *.log.*
