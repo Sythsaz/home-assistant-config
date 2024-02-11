@@ -1,0 +1,57 @@
+[
+    {
+        "Month": "February",
+        "Payment Date": "02-01-2024",
+        "Days Between Payments": "41 days"
+    },
+    {
+        "Month": "March",
+        "Payment Date": "02-26-2024",
+        "Days Between Payments": "24 days"
+    },
+    {
+        "Month": "April",
+        "Payment Date": "03-25-2024",
+        "Days Between Payments": "27 days"
+    },
+    {
+        "Month": "May",
+        "Payment Date": "04-25-2024",
+        "Days Between Payments": "30 days"
+    },
+    {
+        "Month": "June",
+        "Payment Date": "05-28-2024",
+        "Days Between Payments": "32 days"
+    },
+    {
+        "Month": "July",
+        "Payment Date": "06-25-2024",
+        "Days Between Payments": "27 days"
+    },
+    {
+        "Month": "August",
+        "Payment Date": "07-26-2024",
+        "Days Between Payments": "30 days"
+    },
+    {
+        "Month": "September",
+        "Payment Date": "08-27-2024",
+        "Days Between Payments": "31 days"
+    },
+    {
+        "Month": "October",
+        "Payment Date": "09-24-2024",
+        "Days Between Payments": "27 days"
+    },
+    {
+        "Month": "November",
+        "Payment Date": "10-28-2024",
+        "Days Between Payments": "33 days"
+    },
+    {
+        "Month": "December",
+        "Payment Date": "11-26-2024",
+        "Days Between Payments": "28 days"
+    }
+]

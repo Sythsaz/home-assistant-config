@@ -1,0 +1,1093 @@
+- id: '1704667553125'
+  alias: Furnace Room Door Open
+  description: ''
+  trigger:
+  - type: opened
+    platform: device
+    device_id: 991a1e04ce8aac894ef07bde2911e391
+    entity_id: bc0cb274933446988ff6e2e023d53c06
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - light.furnace_room_1
+      - light.furnace_room_2
+  mode: single
+- id: '1704667614052'
+  alias: Furnace Room Door Closed
+  description: ''
+  trigger:
+  - type: not_opened
+    platform: device
+    device_id: 991a1e04ce8aac894ef07bde2911e391
+    entity_id: bc0cb274933446988ff6e2e023d53c06
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - light.furnace_room_1
+      - light.furnace_room_2
+  mode: single
+- id: '1704669182364'
+  alias: PS4 On
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.10_0_1_155
+    to: 'on'
+  condition: []
+  action:
+  - service: mqtt.publish
+    metadata: {}
+    data:
+      qos: '1'
+      topic: cmnd/serverfan/POWER
+      payload: 'on'
+  mode: single
+- id: '1704669225779'
+  alias: PS4 Off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.10_0_1_155
+    to: 'off'
+  condition: []
+  action:
+  - service: mqtt.publish
+    metadata: {}
+    data:
+      qos: '1'
+      payload: 'off'
+      topic: cmnd/serverfan/POWER
+  mode: single
+- id: '1704670287177'
+  alias: Bedroom Closet On
+  description: ''
+  trigger:
+  - type: opened
+    platform: device
+    device_id: 90899fcffdcbccc57c5074d379e90cb0
+    entity_id: 35994bda9b0cad167da3dce7e96c5891
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.bedroom_closet
+  mode: single
+- id: '1704670363877'
+  alias: Bedroom Closet Off
+  description: ''
+  trigger:
+  - type: not_opened
+    platform: device
+    device_id: 90899fcffdcbccc57c5074d379e90cb0
+    entity_id: 35994bda9b0cad167da3dce7e96c5891
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.bedroom_closet
+  mode: single
+- id: '1704691519425'
+  alias: Night Lights Off
+  description: ''
+  trigger:
+  - platform: time
+    at: 00:00:00
+  condition: []
+  action:
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      area_id:
+      - bedroom
+      - furnace_room
+      - kitchen
+  - if:
+    - condition: state
+      entity_id: input_boolean.outside_light_stay_on
+      state: 'off'
+    then:
+    - service: light.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: light.outside
+  mode: single
+- id: '1704697249710'
+  alias: 6am Lights On
+  description: ''
+  trigger:
+  - platform: time
+    at: 06:00:00
+  condition: []
+  action:
+  - service: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: 81c34cddfd77a4a9859c2a70cd441a1d
+  mode: single
+- id: '1704831707801'
+  alias: Env Can Adv Notification Telegram
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.env_can_advisory
+    to:
+    from:
+    id: '01'
+  - platform: state
+    entity_id:
+    - sensor.env_can_current_condition
+    to:
+    id: '02'
+  condition:
+  - condition: not
+    conditions:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: sensor.env_can_advisory
+        state: unavailable
+      - condition: state
+        entity_id: sensor.env_can_advisory
+        state: unknown
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: sensor.env_can_current_condition
+        state: unavailable
+      - condition: state
+        entity_id: sensor.env_can_current_condition
+        state: unknown
+  action:
+  - if:
+    - condition: trigger
+      id:
+      - '01'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Env Can Weather Advisory
+        message: 'New Advisory Change: {{states(''sensor.env_can_advisory'')}}
+
+          '
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Env Can Weather Advisory
+        message: 'New Advisory Change: {{states(''sensor.env_can_advisory'')}}
+
+          '
+        target: 5256494429
+  - if:
+    - condition: trigger
+      id:
+      - '02'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Env Can Weather Condition
+        message: 'New Weather State: {{states(''sensor.env_can_current_condition'')}}
+
+          '
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Env Can Weather Condition
+        message: 'New Weather State: {{states(''sensor.env_can_current_condition'')}}
+
+          '
+        target: 5256494429
+  mode: single
+- id: '1704832756325'
+  alias: S9 Notification Telegram
+  description: ''
+  trigger:
+  - type: battery_level
+    platform: device
+    device_id: 931dd93f50bbb67119039efe4bf39364
+    entity_id: fe0367e7fa2373316b1cf56944a2c805
+    domain: sensor
+    below: 15
+    id: '01'
+  - type: battery_level
+    platform: device
+    device_id: 931dd93f50bbb67119039efe4bf39364
+    entity_id: fe0367e7fa2373316b1cf56944a2c805
+    domain: sensor
+    id: '02'
+    above: 99
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id:
+      - '01'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Battery Notification
+        message_tag: battery
+        message: The S9 is dead
+  - if:
+    - condition: trigger
+      id:
+      - '02'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Battery Notification
+        message_tag: battery
+        message: The S9 is charged
+  mode: single
+- id: '1704834988743'
+  alias: Low battery level detection & Telegram notification for all battery sensors
+  description: ''
+  use_blueprint:
+    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
+    input:
+      actions:
+      - service: telegram_bot.send_message
+        metadata: {}
+        data:
+          message: '{{sensors|replace("_"," ")}}'
+- id: '1704837332890'
+  alias: Iphone Cell State Change Notification
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.syth_connection_type
+    from:
+    to:
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      target: 5256494429
+      message: 'My Iphone''s Cell State has changed to: {{states(''sensor.syth_connection_type'')}}
+
+        '
+  mode: single
+- id: '1704839172870'
+  alias: Syth Zone System
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.costco_wholesale
+    event: enter
+    id: C-E
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.costco_wholesale
+    event: leave
+    id: C-L
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.superstore
+    event: enter
+    id: S-E
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.superstore
+    event: leave
+    id: S-L
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.the_home_depot_south
+    event: enter
+    id: HD-S-E
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.the_home_depot_south
+    event: leave
+    id: HD-S-L
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.wallmart_south
+    event: enter
+    id: WM-S-E
+  - platform: zone
+    entity_id: device_tracker.syth
+    zone: zone.wallmart_south
+    event: leave
+    id: WM-S-L
+  condition: []
+  action: []
+  mode: single
+- id: '1704956367508'
+  alias: 7am Lights On
+  description: ''
+  trigger:
+  - platform: time
+    at: 07:00:00
+  condition: []
+  action:
+  - service: light.turn_on
+    target:
+      area_id:
+      - kitchen
+      entity_id:
+      - light.bedside_lamp
+      - light.k_bedside_lamp
+    data: {}
+  mode: single
+- id: '1704986959244'
+  alias: Wind Chill Notification Group
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.accuweather_realfeel_temperature
+  - platform: state
+    entity_id: sensor.openweathermapdetails_feels_like_temperature
+  - platform: state
+    entity_id: sensor.env_can_wind_chill
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    data_template:
+      target: -1001888460290
+      message: "{% set accuweather_wind_chill =\nstates('sensor.accuweather_realfeel_temperature')
+        | float %} {% set\nopenweathermap_wind_chill =\nstates('sensor.openweathermapdetails_feels_like_temperature')
+        | float %} {%\nset envcan_wind_chill = states('sensor.env_can_wind_chill')
+        | float %}\n\n{% if accuweather_wind_chill < -30 and\n      openweathermap_wind_chill
+        < -30 and\n      envcan_wind_chill < -30 %}\n\n  The current wind chill is
+        below -30.\n  AccuWeather: {{ accuweather_wind_chill }},\n  OpenWeatherMap:
+        {{ openweathermap_wind_chill }},\n  EnvCan: {{ envcan_wind_chill }}\n\n{%
+        endif %}\n"
+  mode: single
+- id: '1705010825199'
+  alias: Ashton Leave Home
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: person.ashton
+    zone: zone.home
+    event: leave
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Automation
+      message: Looks like I'm leaving home
+      target: 5256494429
+  mode: single
+- id: '1705010859963'
+  alias: Ashton At Home
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: person.ashton
+    zone: zone.home
+    event: enter
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Automation
+      message: Looks like I'm now at home
+      target: 5256494429
+  mode: single
+- id: '1705036960723'
+  alias: Full moon notification
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.moon_phase
+    to: waxing_gibbous
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Moon Automation
+      message: Looks like it’s the last phase before a full moon!
+      target: -1001888460290
+  mode: single
+- id: '1705158800802'
+  alias: External IP Monitor
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.opnsense_external_ip
+    from:
+    to:
+  condition: []
+  action:
+  - if:
+    - condition: template
+      value_template: '{{is_state(entity_id, rounded=False, with_unit=False) != states.input_text.external_ip.state}}'
+    then:
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.external_ip
+      data:
+        value: '{{states.sensor.opnsense_external_ip}}'
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        title: Automation
+        message: 'External IP Changed to: {{states(''sensor.opnsense_external_ip'')}}
+
+          '
+  mode: single
+- id: '1705159082930'
+  alias: Env Can Summary Set
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.env_can_summary
+    from:
+    to:
+  condition: []
+  action:
+  - if:
+    - condition: template
+      value_template: '{{is_state(entity_id, with_unit=False) != states.sensor.env_can_summary}}'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        target: -1001888460290
+        title: Env Can Summary
+        message: '{{state(''sensor.env_can_summary'')}}
+
+          '
+    - service: input_text.set_value
+      metadata: {}
+      data:
+        value: '{{sates.sensor.env_can_summary.state}}'
+      target:
+        entity_id: input_text.env_can_summary_store
+  mode: single
+- id: '1705174926749'
+  alias: Outside Light Helper On
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: e63d3bc1e877932cc2eeb5ba68d4060c
+    entity_id: 5a47bad193ad7549f91b62e3e1229919
+    domain: light
+  - platform: state
+    entity_id:
+    - input_boolean.outside_light_stay_on
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id:
+    - timer.outside_light_timer
+    from: active
+    to: idle
+  condition: []
+  action:
+  - if:
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: input_boolean.outside_light_stay_on
+        state: 'off'
+      - condition: state
+        entity_id: light.outside
+        state: 'on'
+      - condition: state
+        entity_id: timer.outside_light_timer
+        state: idle
+    then:
+    - service: timer.start
+      target:
+        entity_id: timer.outside_light_timer
+      data: {}
+    else:
+    - service: light.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: light.outside
+  mode: single
+- id: '1705198430265'
+  alias: Lethbridge News Notification
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.lethbridge_news_item_1
+  condition:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.lethbridge_news_item_1
+      state: unknown
+    - condition: state
+      entity_id: sensor.lethbridge_news_item_1
+      state: unavailable
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Lethbridge News
+      message: '{{states(''sensor.lethbridge_news_item_1'')}}
+
+        '
+  mode: single
+- id: '1705199297578'
+  alias: Alberta Alert RSS
+  description: ''
+  trigger:
+  - platform: event
+    event_type: feedreader
+    event_data:
+      feed_url: https://www.alberta.ca/data/aea/rss/feed-full.atom
+  condition:
+  - condition: template
+    value_template: "{% if is_state('trigger.event.data', 'unavailable') %}\n  false\n{%
+      else %}\n  {% if is_state('trigger.event.data', 'unknown') %}\n    false\n  {%
+      else %}\n    {% if is_state('trigger.event.data', 'Sorry, no feed items were
+      found.') %}\n      false\n    {% else %}\n      true\n    {% endif %}\n  {%
+      endif %}             \n{% endif %}"
+  action:
+  - service: telegram_bot.send_message
+    data:
+      message: '{{trigger.event.data}}'
+      title: New Alberta Alert RSS
+  mode: single
+- id: '1705256283287'
+  alias: HA Start/Stop
+  description: ''
+  trigger:
+  - platform: homeassistant
+    event: start
+    id: '01'
+  - platform: homeassistant
+    event: shutdown
+    id: '02'
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id:
+      - '01'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        message: Home Assistant has Started!
+        title: Automation
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        message: Home Assistant has Started!
+        target: 5256494429
+        title: Automation
+  - if:
+    - condition: trigger
+      id:
+      - '02'
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        message: Home Assistant is Stopping!
+        title: Automation
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        message: Home Assistant is Stopping!
+        target: 5256494429
+        title: Automation
+  mode: single
+- id: '1705332987435'
+  alias: Grid Alert Notification
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.alberta_power_grid_alert
+  condition:
+  - condition: not
+    conditions:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: sensor.alberta_power_grid_alert
+        state: unavailable
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 0
+      - condition: state
+        entity_id: sensor.alberta_power_grid_alert
+        state: unknown
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 0
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Grid Alert
+      target:
+      - 1025100466
+      - 5256494429
+      message: '{{states(''sensor.alberta_power_grid_alert'')}}
+
+        '
+  mode: single
+- id: '1705343340123'
+  alias: Alberta Electric System Operator RSS
+  description: ''
+  trigger:
+  - platform: event
+    event_type: feedreader
+    event_data:
+      feed_url: https://www.aeso.ca/rss/grid-alert
+  condition:
+  - condition: template
+    value_template: "{% if is_state('trigger.event.data', 'unavailable') %}\n  false\n{%
+      else %}\n  {% if is_state('trigger.event.data', 'unknown') %}\n    false\n  {%
+      else %}\n    {% if is_state('trigger.event.data', 'Sorry, no feed items were
+      found.') %}\n      false\n    {% else %}\n      true\n    {% endif %}\n  {%
+      endif %}             \n{% endif %}"
+  action:
+  - service: telegram_bot.send_message
+    data:
+      message: '{{trigger.event.data}}'
+      title: New Alberta Electric System Operator RSS
+      target:
+      - 5256494429
+      - 1025100466
+  mode: single
+- id: '1705383965820'
+  alias: Telegram Bot Commands
+  description: ''
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: /whoop-up-photo
+    id: '01'
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: /weather
+    id: '02'
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: /AccuWeather
+    id: '03'
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: /EnvCan
+    id: '04'
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: /OpenWeather
+    id: '05'
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id:
+      - '01'
+    then:
+    - service: telegram_bot.send_photo
+      data:
+        target: '{{trigger.event.data.chat_id}}'
+        url: https://westlethbridgeweather.com/westlethbridgeweather.com/wlwxcam/WhoopUpDriveCamera.jpg
+  - if:
+    - condition: trigger
+      id:
+      - '02'
+    then:
+    - service: telegram_bot.send_message
+      data:
+        inline_keyboard: /AccuWeather, /EnvCan, /OpenWeather
+        message: Here's the current providers
+        target: '{{trigger.event.data.chat_id}}'
+        title: Weather Automation
+  - if:
+    - condition: trigger
+      id:
+      - '03'
+    then:
+    - service: telegram_bot.send_message
+      data:
+        message: 'Here''s the current AccuWeather Data: {{ state_attr(''weather.accuweather'',''temperature'')
+          }}{{ state_attr(''weather.accuweather'',''temperature_unit'') }}, {{ state_attr(''weather.accuweather'',''apparent_temperature'')
+          }}{{ state_attr(''weather.accuweather'',''temperature_unit'') }}, {{ state_attr(''weather.accuweather'','''')
+          }}'
+        target:
+        - 1025100466
+        title: AccuWeather Automation
+    enabled: false
+  mode: single
+- id: '1705434511905'
+  alias: Accuweather Pressure Automation Telegram
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.accuweather_pressure_tendency
+  condition:
+  - condition: and
+    conditions:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: sensor.accuweather_pressure_tendency
+        state: unavailable
+      - condition: state
+        entity_id: sensor.accuweather_pressure_tendency
+        state: unknown
+  action:
+  - if:
+    - condition: state
+      entity_id: sensor.accuweather_pressure_tendency
+      state: falling
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        target: -1001888460290
+        title: Automation
+        message: 'The pressure outside is now {{states(''sensor.accuweather_pressure_tendency'')}}.
+
+          '
+  - if:
+    - condition: state
+      entity_id: sensor.accuweather_pressure_tendency
+      state: rising
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        target: -1001888460290
+        title: Automation
+        message: 'The pressure outside is now {{states(''sensor.accuweather_pressure_tendency'')}}.
+
+          '
+  mode: single
+- id: '1705435295946'
+  alias: UV Index Notification
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.openuv_current_uv_level
+  condition:
+  - condition: not
+    conditions:
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: sensor.openuv_current_uv_level
+        state: unavailable
+      - condition: state
+        entity_id: sensor.openuv_current_uv_level
+        state: unknown
+  action:
+  - if:
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: sensor.openuv_current_uv_level
+        state: extreme
+      - condition: state
+        entity_id: sensor.openuv_current_uv_level
+        state: very_high
+      - condition: state
+        entity_id: sensor.openuv_current_uv_level
+        state: high
+      - condition: state
+        entity_id: sensor.openuv_current_uv_level
+        state: moderate
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        target: -1001888460290
+        title: Automation
+        message: "The UV Index is currently {{states('sensor.openuv_current_uv_index')}}
+          or {{states('sensor.openuv_current_uv_level')}}. \n"
+  mode: single
+- id: '1705451986799'
+  alias: A/J personal Ashton Home
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.syth_bssid
+    from:
+    to:
+  condition:
+  - condition: state
+    entity_id: input_boolean.a_j_personal_ashton_home_toggle
+    state: 'off'
+  action:
+  - if:
+    - condition: state
+      entity_id: sensor.syth_bssid
+      state: cc:32:e5:18:16:8a
+    then:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        message: Looks like I’m back home!
+        title: Automation
+        target: -1001958091800
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.a_j_personal_ashton_home_toggle
+      data: {}
+    else:
+    - service: telegram_bot.send_message
+      metadata: {}
+      data:
+        message: Looks like I’m away from home!
+        title: Automation
+        target: -1001958091800
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+        - input_boolean.a_j_personal_ashton_home_toggle
+      data: {}
+  mode: single
+- id: '1705697456406'
+  alias: Uno WiFi Rev 2 Will
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.10_0_1_175
+    from: 'off'
+    to: 'on'
+    id: '01'
+  - platform: state
+    entity_id:
+    - binary_sensor.10_0_1_175
+    from: 'on'
+    to: 'off'
+    id: '02'
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id:
+      - '01'
+    then:
+    - service: mqtt.publish
+      metadata: {}
+      data:
+        qos: '2'
+        retain: true
+        topic: homesense/uw2/will
+  mode: single
+- id: '1705930338838'
+  alias: Outside Light HelperOff
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - timer.outside_light_timer
+    from: active
+    to: idle
+    id: '01'
+  - platform: state
+    entity_id:
+    - input_boolean.outside_light_stay_on
+    from: 'on'
+    to: 'off'
+    id: '02'
+  - platform: state
+    entity_id:
+    - light.outside
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      entity_id:
+      - light.outside
+    data: {}
+  - service: timer.cancel
+    target:
+      entity_id:
+      - timer.outside_light_timer
+    data: {}
+  mode: single
+- id: '1706058238070'
+  alias: News Webhook
+  description: ''
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    - PUT
+    - GET
+    - HEAD
+    local_only: true
+    webhook_id: -WIpMQjoPq24kvh-Iu5kvY8t-
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      message: '{{trigger.json.data}}'
+      title: '{{trigger.json.title}}'
+  mode: single
+- id: '1706240913792'
+  alias: Aurora Notification Telegram Boyz
+  description: ''
+  trigger:
+  - type: turned_on
+    platform: device
+    device_id: f09cc49a63abc3270dc91bb61f057198
+    entity_id: 9c602f6a3cc99903bf7896fccabd8e17
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      target: -1001888460290
+      title: Automation
+      message: 'The Aurora is currently {{states(''sensor.aurora_49_112'')}}
+
+        '
+  mode: single
+- id: '1706713811376'
+  alias: Update notifications
+  description: ''
+  use_blueprint:
+    path: mdegat01/update_notifications.yaml
+    input:
+      update_entities:
+      - update.automoli_auto_motion_lights_update
+      - update.adaptive_lighting_update
+      - update.aircast_update
+      - update.assist_microphone_update
+      - update.browser_mod_update
+      - update.castsponsorskip_update
+      - update.emqx_update
+      - update.esphome_update
+      - update.file_editor_update
+      - update.grocy_update
+      - update.hacs_update
+      - update.home_assistant_core_update
+      - update.home_assistant_google_drive_backup_update
+      - update.home_assistant_supervisor_update
+      - update.horizon_card_update
+      - update.iphone_device_tracker_update
+      - update.lovelace_card_templater_update
+      - update.mopidy_update
+      - update.mpd_update
+      - update.node_red_companion_update
+      - update.portainer_agent_update
+      - update.portainer_update
+      - update.tailscale_update
+      - update.tasmoadmin_update
+      - update.opnsense_integration_for_home_assistant_update
+      - update.studio_code_server_update
+      mobile_app_device: 4ecf319eb7f4167142247d671be7823f
+      mobile_app_device_2: 931dd93f50bbb67119039efe4bf39364
+      send_to_ha: true
+      run_config_check: true
+      only_after: 06:00:00
+      only_before: '23:00:00'
+- id: '1707150875048'
+  alias: Telegram Bot Filtering
+  description: ''
+  trigger:
+  - platform: event
+    event_type: telegram_text
+    event_data:
+      chat_id: -1002112573486
+  condition: []
+  action:
+  - if:
+    - condition: template
+      value_template: '{% if trigger.event.data.text == none %}True{% else %}False{%
+        endif %}'
+    then:
+    - service: telegram_bot.delete_message
+      metadata: {}
+      data:
+        message_id: '{{ trigger.event.data.id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+      enabled: true
+  mode: single
+- id: '1707200378991'
+  alias: LivingTV Buffering Notification
+  description: ''
+  trigger:
+  - platform: device
+    device_id: 3483e52fb92ba114c6745dda6a95d551
+    domain: media_player
+    entity_id: 502b09babe1698d566c33aca62c4c9b8
+    type: buffering
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Automation
+      message: Living tv is buffering
+  mode: single
+- id: '1707277335102'
+  alias: Arduino Uno
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.10_0_1_175
+    from:
+    to:
+  condition: []
+  action:
+  - service: telegram_bot.send_message
+    metadata: {}
+    data:
+      title: Automation
+      message: 'The Arduino is now: {{states(''binary_sensor.10_0_1_175'')}}
+
+        '
+  mode: single

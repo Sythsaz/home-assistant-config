@@ -1,0 +1,12 @@
+append_time_location_ashton_sheets:
+  alias: Append Time Location Ashton Sheets
+  sequence:
+  - service: google_sheets.append_sheet
+    metadata: {}
+    data:
+      config_entry: d07eeeee00ead597ea5aaa362ad17e83
+      worksheet: Field Agent Store Times
+      data:
+        Location:
+          '[object Object]':
+  mode: single

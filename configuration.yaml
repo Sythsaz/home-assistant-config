@@ -1,0 +1,85 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+#Added In
+device_tracker:
+  - platform: bluetooth_le_tracker
+    track_new_devices: true
+    track_battery: true
+    track_battery_interval: 01:00:00
+
+# Example configuration.yaml entry
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_api_key
+    allowed_chat_ids:
+      - !secret telegram_chat_id_ashton
+      - !secret telegram_chat_id_justice #Justice
+      #Add Kit
+      - !secret telegram_group_id_boyz #Boyz Group
+
+feedreader:
+  urls:
+    - https://www.alberta.ca/data/aea/rss/feed-full.atom #Alberta Emergencry Alert
+    - https://www.aeso.ca/rss/grid-alert # Alberta Electric System Operator Grid Alert
+  scan_interval:
+    minutes: 5
+
+logger:
+  default: warning
+#  logs:
+#    homeassistant.components.sensor: debug
+
+scrape:
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 1
+        select: "#gs-feed-1 > div > ul > li:nth-child(1) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 2
+        select: "#gs-feed-1 > div > ul > li:nth-child(2) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 3
+        select: "#gs-feed-1 > div > ul > li:nth-child(3) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 4
+        select: "#gs-feed-1 > div > ul > li:nth-child(4) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 5
+        select: "#gs-feed-1 > div > ul > li:nth-child(5) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 6
+        select: "#gs-feed-1 > div > ul > li:nth-child(6) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 7
+        select: "#gs-feed-1 > div > ul > li:nth-child(7) > div > div > span"
+
+  - resource: https://www.lethbridge.ca/news/
+    sensor:
+      - name: Lethbridge News Item 8
+        select: "#gs-feed-1 > div > ul > li:nth-child(8) > div > div > span"
+
+  - resource: https://www.aeso.ca/
+    sensor:
+      - name: Alberta Power Grid Alert
+        select: "body > section > div > div > p"
